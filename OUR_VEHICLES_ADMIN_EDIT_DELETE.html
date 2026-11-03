@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OUR VEHICLES</title>
+<style>
+:root{--navy:#102039;--blue:#167dba;--green:#16845b;--purple:#7651a6;--grey:#e7edf4;--ink:#192b43}
+*{box-sizing:border-box}
+body{margin:0;padding:12px;background:#e5ebf2;color:var(--ink);font-family:Arial,sans-serif}
+.app{width:4in;max-width:100%;min-height:5in;margin:auto;background:#fff;border-radius:15px;overflow:hidden;box-shadow:0 8px 28px #24364b35}
+header{background:linear-gradient(135deg,#102039,#185c88);color:#fff;text-align:center;padding:18px 12px}
+header .car{font-size:32px}header h1{margin:5px 0;font-size:23px;letter-spacing:1.5px}header p{font-size:10px;letter-spacing:1px;margin:6px 0 0;color:#d5e9fa}
+main{padding:12px}h2{font-size:17px;margin:4px 0 12px}
+button{border:0;border-radius:7px;padding:10px;font-weight:bold;font-size:12px;cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid #168ac8;outline-offset:2px}
+.screen{display:none}.screen.active{display:block}
+.action-btn{width:100%;display:block;margin-top:9px;background:var(--navy);color:#fff}
+.new-btn{background:var(--green)}.report-btn{background:var(--purple)}.admin-btn{background:#45556a}.refresh-btn{background:#176da5}.backup-btn{background:#176b54}.delete-btn{background:#b93434}.record-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}.record-actions button{width:100%;margin:0}.record-edit-btn{background:#176da5;color:#fff}.record-delete-btn{background:#b93434;color:#fff}
+.vehicle-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:12px}
+.vehicle-card{border:1px solid #dbe5ef;border-radius:10px;padding:12px 6px;background:#f5f8fc;text-align:center;min-width:0}
+.vehicle-card{padding:0;overflow:hidden}.vehicle-photo{height:112px;position:relative;background:#dce5ee}.vehicle-photo img{width:100%;height:100%;object-fit:cover;display:block}.vehicle-photo .vehicle-number{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent,#071323e8);color:#fff;font-size:11px;font-weight:bold;padding:18px 5px 7px;text-align:center;overflow-wrap:anywhere}.vehicle-card h3{font-size:12px;margin:7px 4px 9px;overflow-wrap:anywhere}.vehicle-card .open-btn{border-radius:0;width:100%;background:var(--blue);color:white}
+.open-btn{width:100%;background:var(--blue);color:white}
+.home-actions{display:grid;grid-template-columns:1fr;gap:8px}
+.back-btn{background:#e4edf6;color:#183451;margin-bottom:12px}
+label{display:block;font-size:12px;font-weight:bold;margin:11px 0 5px}
+input,textarea{display:block;width:100%;padding:10px;border:1px solid #cbd7e3;border-radius:7px;background:#fff;color:#192b43;font:inherit;font-size:13px}
+textarea{min-height:74px;resize:vertical}
+.form-section{margin:12px 0 6px;padding:11px;border:1px solid #e0e7ef;border-radius:9px}
+.form-section h3{margin:0 0 8px;font-size:14px}
+.form-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.save-btn{background:var(--green);color:#fff}.cancel-btn{background:#e5ebf2;color:#26384d}
+.detail-row{padding:9px 0;border-bottom:1px solid #e4eaf0;font-size:12px;overflow-wrap:anywhere}
+.detail-row strong{display:block;color:#52667e;font-size:11px;margin-bottom:4px}
+.report-card{background:#f3f7fb;padding:11px;border-radius:9px;margin:8px 0;font-size:12px;overflow-wrap:anywhere}
+.message{display:none;padding:10px;border-radius:7px;margin-bottom:10px;background:#dcfce7;color:#166534;font-size:12px}
+.message.show{display:block}.empty-note{font-size:12px;color:#64748b;background:#f3f7fb;padding:12px;border-radius:8px}
+footer{text-align:center;font-size:10px;padding:12px;color:#718096}
+@media(max-width:360px){body{padding:5px}header h1{font-size:20px}main{padding:9px}}
+/* A4 portrait report/print layout */
+@page{size:A4 portrait;margin:8mm}
+@media print{
+  body{padding:0;margin:0;background:#fff;color:#000;font-family:Arial,sans-serif}
+  .app{width:100%;max-width:none;min-height:0;margin:0;border-radius:0;box-shadow:none;overflow:visible}
+  header{background:#fff!important;color:#000!important;border-bottom:1px solid #333;padding:4mm 0}
+  header .car,header p,footer,.no-print,button,.message{display:none!important}
+  header h1{font-size:16pt;letter-spacing:1pt;margin:0}
+  main{padding:3mm 0}
+  .screen{display:none!important}
+  #reports.screen.active{display:block!important}
+  #reports h2{font-size:11pt;margin:2mm 0}
+  #reportContent{font-size:7pt}
+  .report-card{background:#fff;border:0;border-bottom:1px solid #bbb;border-radius:0;padding:2mm 0;margin:0;font-size:7pt;break-inside:avoid}
+  .report-card h3{font-size:8pt;margin:0 0 1mm}
+  .report-card .report-grid{display:grid;grid-template-columns:1fr 1fr;gap:1mm 4mm}
+  .report-card .field{overflow-wrap:anywhere}
+  .report-card .field strong{font-weight:bold}
+  .report-card .service-print{margin:1mm 0 0 3mm;padding:1mm 0;border-top:1px dotted #aaa}
+  .report-summary{font-size:8pt;margin:1mm 0 2mm}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div class="car">🚘</div><h1>OUR VEHICLES</h1><p>VEHICLE MANAGEMENT SYSTEM</p></header>
+<main>
+<div id="message" class="message" role="status" aria-live="polite"></div>
+
+<section id="home" class="screen active">
+  <div id="vehicleGrid" class="vehicle-grid"></div>
+  <div class="home-actions">
+    <button class="action-btn new-btn" onclick="newVehicle()">＋ NEW VEHICLE</button>
+    <button class="action-btn report-btn" onclick="showReports()">▤ REPORTS / PRINT PDF</button>
+    <button class="action-btn admin-btn" onclick="showAdmin()">⚙ ADMIN</button>
+  </div>
+</section>
+
+<section id="details" class="screen">
+  <button class="back-btn no-print" onclick="goHome()">← BACK</button>
+  <h2 id="detailTitle">Vehicle Details</h2>
+  <div id="detailContent"></div>
+</section>
+
+<section id="editor" class="screen">
+  <button class="back-btn no-print" onclick="goHome()">← BACK</button>
+  <h2 id="formTitle">New Vehicle</h2>
+  <form id="vehicleForm">
+    <div class="form-section">
+      <h3>Vehicle Details</h3>
+      <label for="name">Vehicle Name / Type</label><input id="name" placeholder="e.g. Car, Jeep, Bus">
+      <label for="number">Vehicle Registration Number *</label><input id="number" required placeholder="e.g. KL-01-AB-1234">
+      <label for="vehicleImage">Select Vehicle Picture (from your computer)</label>
+      <input id="vehicleImage" type="file" accept="image/*">
+      <div id="imagePreview" style="display:none;margin-top:8px"><img id="previewImage" alt="Vehicle picture preview" style="width:100%;max-height:180px;object-fit:contain;border:1px solid #ccd7e2;border-radius:8px"><button type="button" class="cancel-btn" onclick="clearVehicleImage()" style="width:100%;margin-top:6px">REMOVE PICTURE</button></div>
+      <p style="font-size:11px;color:#62758b">Choose a vehicle photo from a folder on your computer. It will be shown on the vehicle tile with its registration number overlaid.</p>
+      <label for="engine">Engine Number</label><input id="engine">
+      <label for="chassis">Chassis Number</label><input id="chassis">
+      <label for="year">Year of Manufacturing</label><input id="year" type="number" min="1900" max="2100" placeholder="e.g. 2024">
+      <label for="registration">Registration Due Date</label><input id="registration" type="date">
+      <label for="tax">Tax Valid Till</label><input id="tax" type="date">
+      <label for="insurance">Insurance Valid Till</label><input id="insurance" type="date">
+    </div>
+    <div class="form-section">
+      <h3>Service Information</h3>
+      <p style="font-size:11px;color:#62758b">Enter service details here. Vehicle details and service information are saved together using the single Save button.</p>
+      <label for="serviceDate">Service Date</label><input id="serviceDate" type="date">
+      <label for="serviceType">Service / Oil Change</label><input id="serviceType" placeholder="e.g. Engine oil change">
+      <label for="serviceDetails">Service Details / Work Done</label><textarea id="serviceDetails" placeholder="Oil type, parts changed, work carried out, notes..."></textarea>
+      <label for="serviceExpense">Service Expense (₹)</label><input id="serviceExpense" type="number" min="0" step="0.01" placeholder="0.00">
+      <label for="nextService">Next Service Due Date</label><input id="nextService" type="date">
+      <label for="otherServices">Other Service History (optional)</label><textarea id="otherServices" placeholder="Enter any earlier service records, one per line, with date and expense if known."></textarea>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="save-btn">SAVE ALL DETAILS</button>
+      <button type="button" class="cancel-btn" onclick="goHome()">CANCEL</button>
+    </div>
+  </form>
+</section>
+
+<section id="reports" class="screen">
+  <div class="no-print"><button class="back-btn" onclick="goHome()">← BACK</button></div>
+  <h2>Vehicle Report</h2>
+  <p class="no-print" style="font-size:12px;color:#62758b">Select “PRINT / SAVE AS PDF” to print all vehicle data on A4 portrait pages. In the print dialog, choose “Save as PDF” to create a PDF file.</p>
+  <div id="reportContent"></div>
+  <button class="action-btn report-btn no-print" onclick="window.print()">🖨 PRINT / SAVE AS PDF (A4)</button>
+</section>
+
+<section id="admin" class="screen">
+  <button class="back-btn no-print" onclick="goHome()">← BACK</button>
+  <h2>Admin Panel</h2>
+  <div class="report-card">Saved vehicles: <strong id="vehicleCount">0</strong></div>
+  <button class="action-btn refresh-btn" onclick="refreshData()">↻ REFRESH DATA</button>
+  <button class="action-btn backup-btn" onclick="exportData()">⬇ BACK UP ALL DATA (JSON)</button>
+  <button class="action-btn backup-btn" onclick="exportExcel()">📊 BACK UP TO EXCEL (Excel Worksheet)</button>
+  <button class="action-btn delete-btn" onclick="deleteAllData()">✖ DELETE ALL DATA</button>
+  <p style="font-size:11px;color:#62758b">Excel backup downloads as an Excel-readable worksheet with vehicle details arranged in rows and columns. Keep the JSON backup too, because it is used to restore data back into this app.</p>
+  <p style="font-size:11px;color:#62758b">Make a backup before deleting data. Deletion cannot be undone unless you have a backup.</p>
+  <label for="importFile">Restore from a JSON backup</label><input id="importFile" type="file" accept=".json">
+  <button class="action-btn" onclick="importData()">RESTORE BACKUP</button>
+  <h3 style="font-size:14px;margin-top:18px">Edit Existing Vehicle</h3>
+  <div id="adminContent"></div>
+</section>
+</main>
+<footer>OUR VEHICLES • Vehicle Records</footer>
+</div>
+
+<script>
+const STORAGE_KEY = "ourVehiclesData_v2";
+let vehicles = [];
+let currentId = null;
+let editingId = null;
+let adminUnlocked = false;
+let messageTimer;
+
+function el(id){return document.getElementById(id)}
+function makeId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,9)}
+let selectedVehicleImage="";
+function clearVehicleImage(){
+  selectedVehicleImage="";
+  el("vehicleImage").value="";
+  el("imagePreview").style.display="none";
+  el("previewImage").src="";
+}
+function handleVehicleImage(file){
+  if(!file){clearVehicleImage();return}
+  if(!file.type.startsWith("image/")){showMessage("Please choose an image file.");return}
+  const reader=new FileReader();
+  reader.onload=()=>{
+    const image=new Image();
+    image.onload=()=>{
+      // Resize/compress image before storing it in browser storage.
+      const canvas=document.createElement("canvas");
+      const max=900,scale=Math.min(1,max/Math.max(image.width,image.height));
+      canvas.width=Math.round(image.width*scale);canvas.height=Math.round(image.height*scale);
+      canvas.getContext("2d").drawImage(image,0,0,canvas.width,canvas.height);
+      selectedVehicleImage=canvas.toDataURL("image/jpeg",0.78);
+      el("previewImage").src=selectedVehicleImage;
+      el("imagePreview").style.display="block";
+    };
+    image.onerror=()=>showMessage("Could not read that image. Please select another picture.");
+    image.src=reader.result;
+  };
+  reader.onerror=()=>showMessage("Could not load the selected image.");
+  reader.readAsDataURL(file);
+}
+el("vehicleImage").addEventListener("change",event=>handleVehicleImage(event.target.files[0]));
+function escapeHTML(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+
+function showMessage(text){
+  const box=el("message");box.textContent=text;box.classList.add("show");
+  clearTimeout(messageTimer);messageTimer=setTimeout(()=>box.classList.remove("show"),4000);
+}
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  el(id).classList.add("active");el("message").classList.remove("show");window.scrollTo(0,0);
+}
+function persist(){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(vehicles));return true}
+  catch(e){showMessage("Save failed. Please export a backup and check browser storage.");return false}
+}
+function loadData(){
+  try{
+    const saved=localStorage.getItem(STORAGE_KEY);
+    if(saved!==null){
+      const parsed=JSON.parse(saved);
+      vehicles=Array.isArray(parsed)?parsed:[];
+    }else{
+      // Migrate records from the earlier version of this website, if present.
+      const old=localStorage.getItem("ourVehiclesData_v1");
+      vehicles=old?JSON.parse(old):[];
+      if(!Array.isArray(vehicles))vehicles=[];
+      vehicles=vehicles.map(v=>({
+        id:v.id||makeId(),name:v.name||"",number:v.number||"",engine:v.engine||"",
+        chassis:v.chassis||"",year:v.year||"",registration:v.registration||"",
+        tax:v.tax||"",insurance:v.insurance||"",
+        serviceDate:(v.services||[])[0]?.date||"",
+        serviceType:(v.services||[])[0]?.type||"",
+        serviceDetails:(v.services||[]).map(s=>[s.date,s.type,s.details,s.expense?"₹"+s.expense:"",s.nextDate?"Next: "+s.nextDate:""].filter(Boolean).join(" — ")).join("\n"),
+        serviceExpense:(v.services||[])[0]?.expense||"",
+        nextService:(v.services||[])[0]?.nextDate||"",
+        otherServices:(v.services||[]).slice(1).map(s=>[s.date,s.type,s.details,s.expense?"₹"+s.expense:"",s.nextDate?"Next: "+s.nextDate:""].filter(Boolean).join(" — ")).join("\n")
+      }));
+      persist();
+    }
+  }catch(e){vehicles=[];showMessage("Saved data could not be read. Restore a JSON backup if available.");}
+  renderHome();
+}
+function renderHome(){
+  el("vehicleGrid").innerHTML=vehicles.map((v,i)=>`
+    <div class="vehicle-card">
+    <div class="vehicle-photo">${v.image?`<img src="${v.image}" alt="${escapeHTML(v.name||"Vehicle")}">`:`<div style="height:100%;display:grid;place-items:center;font-size:42px">🚘</div>`}
+    <div class="vehicle-number">${escapeHTML(v.number||"Number not entered")}</div></div>
+    <h3>${escapeHTML(v.name||"Vehicle "+(i+1))}</h3>
+    <button class="open-btn" onclick="openVehicle('${escapeHTML(v.id)}')">OPEN VEHICLE ${i+1}</button></div>`).join("");
+}
+function getVehicle(id){return vehicles.find(v=>v.id===id)}
+function goHome(){adminUnlocked=false;renderHome();showScreen("home")}
+function openVehicle(id){
+  const v=getVehicle(id);if(!v)return;currentId=id;
+  el("detailTitle").textContent=v.name||"Vehicle Details";
+  const fields=[["Vehicle Name / Type",v.name],["Registration Number",v.number],["Engine Number",v.engine],["Chassis Number",v.chassis],["Year of Manufacturing",v.year],["Registration Due Date",v.registration],["Tax Valid Till",v.tax],["Insurance Valid Till",v.insurance],["Service Date",v.serviceDate],["Service / Oil Change",v.serviceType],["Service Details",v.serviceDetails],["Service Expense (₹)",v.serviceExpense],["Next Service Due Date",v.nextService],["Other Service History",v.otherServices]];
+  el("detailContent").innerHTML=fields.map(([label,value])=>`<div class="detail-row"><strong>${escapeHTML(label)}</strong>${escapeHTML(value||"Not entered").replace(/\n/g,"<br>")}</div>`).join("");
+  showScreen("details");
+}
+function newVehicle(){
+  editingId=null;selectedVehicleImage="";el("vehicleForm").reset();clearVehicleImage();
+  el("formTitle").textContent="New Vehicle";showScreen("editor");
+}
+function editCurrent(){if(currentId)editVehicle(currentId)}
+function editVehicle(id){
+  if(!adminUnlocked){showMessage("Please open Admin and enter the correct password first.");return;}
+  const v=getVehicle(id);if(!v)return;editingId=id;el("vehicleForm").reset();
+  ["name","number","engine","chassis","year","registration","tax","insurance","serviceDate","serviceType","serviceDetails","serviceExpense","nextService","otherServices"].forEach(k=>el(k).value=v[k]||"");
+  selectedVehicleImage=v.image||"";
+  el("vehicleImage").value="";
+  if(selectedVehicleImage){el("previewImage").src=selectedVehicleImage;el("imagePreview").style.display="block"}else{el("imagePreview").style.display="none";el("previewImage").src=""}
+  el("formTitle").textContent="Edit Vehicle Details";showScreen("editor");
+}
+el("vehicleForm").addEventListener("submit",event=>{
+  event.preventDefault();
+  const number=el("number").value.trim();
+  if(!number){showMessage("Please enter the vehicle registration number.");el("number").focus();return}
+  if(vehicles.some(v=>String(v.number||"").trim().toLowerCase()===number.toLowerCase()&&v.id!==editingId)){
+    showMessage("This vehicle number already exists.");return;
+  }
+  const vehicle={id:editingId||makeId()};
+  ["name","number","engine","chassis","year","registration","tax","insurance","serviceDate","serviceType","serviceDetails","serviceExpense","nextService","otherServices"].forEach(k=>vehicle[k]=el(k).value.trim());
+  vehicle.image=selectedVehicleImage || (editingId?getVehicle(editingId)?.image||"":"");
+  if(!vehicle.name)vehicle.name="Vehicle";
+  const old=vehicles;
+  vehicles=editingId?vehicles.map(v=>v.id===editingId?vehicle:v):[...vehicles,vehicle];
+  if(!persist()){vehicles=old;return}
+  currentId=vehicle.id;renderHome();renderAdmin();
+  if (editingId) {
+    showScreen("admin");
+    showMessage("Successfully saved!");
+  } else {
+    openVehicle(vehicle.id);
+    showMessage("Successfully saved!");
+  }
+});
+function showAdmin(){
+  const password = prompt("Enter Admin Password:");
+  if (password === null) return;
+  if (password !== "123321") {
+    adminUnlocked = false;
+    alert("Incorrect password. Admin access denied.");
+    return;
+  }
+  adminUnlocked = true;
+  renderAdmin();
+  showScreen("admin");
+}
+function renderAdmin(){
+  el("vehicleCount").textContent=vehicles.length;
+  el("adminContent").innerHTML=vehicles.length?vehicles.map(v=>`
+    <div class="report-card">
+      <strong>${escapeHTML(v.name||"Vehicle")}</strong><br>
+      ${escapeHTML(v.number||"Number not entered")}
+      <div class="record-actions">
+        <button type="button" class="record-edit-btn" onclick="editVehicle('${escapeHTML(v.id)}')">✎ EDIT / CORRECT</button>
+        <button type="button" class="record-delete-btn" onclick="deleteVehicle('${escapeHTML(v.id)}')">✖ DELETE</button>
+      </div>
+    </div>`).join(""):'<p class="empty-note">No vehicles have been added yet.</p>';
+}
+function deleteVehicle(id){
+  if(!adminUnlocked){
+    showMessage("Please open Admin and enter the correct password first.");
+    return;
+  }
+  const vehicle=getVehicle(id);
+  if(!vehicle)return;
+  const label=(vehicle.name||"Vehicle")+" — "+(vehicle.number||"Number not entered");
+  if(!confirm("Delete this vehicle record?\\n\\n"+label+"\\n\\nThis cannot be undone unless you have a backup."))return;
+
+  const previousVehicles=vehicles;
+  vehicles=vehicles.filter(v=>v.id!==id);
+  if(!persist()){
+    vehicles=previousVehicles;
+    return;
+  }
+  if(currentId===id)currentId=null;
+  if(editingId===id)editingId=null;
+  renderHome();
+  renderAdmin();
+  showScreen("admin");
+  showMessage("Vehicle record deleted.");
+}
+function refreshData(){
+  loadData();renderAdmin();showScreen("admin");showMessage("Data refreshed from this browser's saved records.");
+}
+function deleteAllData(){
+  if(!confirm("Delete ALL vehicle records from this browser? This cannot be undone unless you have a backup."))return;
+  if(!confirm("Please confirm one more time: permanently delete all vehicle data?"))return;
+  try{
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem("ourVehiclesData_v1");
+    vehicles=[];currentId=null;editingId=null;
+    renderHome();renderAdmin();showScreen("admin");showMessage("All vehicle data has been deleted.");
+  }catch(e){showMessage("Unable to delete data from browser storage.")}
+}
+function exportData(){
+  try{
+    const blob=new Blob([JSON.stringify(vehicles,null,2)],{type:"application/json"});
+    const url=URL.createObjectURL(blob);const a=document.createElement("a");
+    a.href=url;a.download="our-vehicles-backup.json";document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);showMessage("Backup file download started.");
+  }catch(e){showMessage("Backup could not be created.")}
+}
+
+async function importData(){
+  const fileInput=el("importFile");
+  const file=fileInput.files && fileInput.files[0];
+
+  if(!file){
+    showMessage("Please select a JSON backup file first.");
+    return;
+  }
+
+  try{
+    const text=await file.text();
+    const imported=JSON.parse(text);
+
+    // This app's JSON backup is an array of vehicle records.
+    if(!Array.isArray(imported)){
+      showMessage("Invalid backup file. Vehicle records were not found.");
+      return;
+    }
+
+    // Validate the record shape before changing any saved data.
+    if(!imported.every(v=>
+      v && typeof v==="object" && !Array.isArray(v) &&
+      (typeof v.number==="string" || typeof v.number==="number")
+    )){
+      showMessage("Invalid backup file. Please select an OUR VEHICLES JSON backup.");
+      return;
+    }
+
+    if(!confirm(
+      "Restore "+imported.length+" vehicle record(s) from this backup?\\n\\n"+
+      "The current records will be replaced."
+    )){
+      return;
+    }
+
+    const oldVehicles=vehicles;
+    const restored=imported.map(v=>({
+      ...v,
+      id:v.id ? String(v.id) : makeId(),
+      number:String(v.number ?? ""),
+      image:typeof v.image==="string" ? v.image : ""
+    }));
+
+    vehicles=restored;
+
+    // Persist to this browser so restored records remain after reload.
+    if(!persist()){
+      vehicles=oldVehicles;
+      renderHome();
+      renderAdmin();
+      return;
+    }
+
+    currentId=null;
+    editingId=null;
+    renderHome();
+    renderAdmin();
+    fileInput.value="";
+    showScreen("admin");
+    showMessage("Successfully restored "+vehicles.length+" vehicle record(s), including saved pictures.");
+  }catch(error){
+    showMessage("Restore failed. Please choose a valid JSON backup file.");
+  }
+}
+
+function exportExcel(){
+  try{
+    const columns=[
+      ["Vehicle Name / Type","name"],["Registration Number","number"],
+      ["Engine Number","engine"],["Chassis Number","chassis"],
+      ["Year of Manufacturing","year"],["Registration Due Date","registration"],
+      ["Tax Valid Till","tax"],["Insurance Valid Till","insurance"],
+      ["Service Date","serviceDate"],["Service / Oil Change","serviceType"],
+      ["Service Details","serviceDetails"],["Service Expense (₹)","serviceExpense"],
+      ["Next Service Due Date","nextService"],["Other Service History","otherServices"]
+    ];
+    const esc=value=>String(value??"").replace(/&/g,"&amp;").replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+    let table='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Vehicles</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--><style>table{border-collapse:collapse;font-family:Arial}th,td{border:1px solid #777;padding:6px}th{background:#dce6f1;font-weight:bold}</style></head><body><table><thead><tr>';
+    table+=columns.map(c=>'<th>'+esc(c[0])+'</th>').join('');
+    table+='</tr></thead><tbody>';
+    vehicles.forEach(v=>{
+      table+='<tr>'+columns.map(c=>'<td style="mso-number-format:\\@">'+esc(v[c[1]]??"")+'</td>').join('')+'</tr>';
+    });
+    table+='</tbody></table></body></html>';
+    const blob=new Blob(["\\uFEFF",table],{type:"application/vnd.ms-excel;charset=utf-8;"});
+    const url=URL.createObjectURL(blob);const a=document.createElement("a");
+    a.href=url;a.download="our-vehicles-excel-backup.xls";
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+    showMessage("Excel worksheet download started. Open our-vehicles-excel-backup.xls in Microsoft Excel.");
+  }catch(e){showMessage("Excel backup could not be created.")}
+}
+function showReports(){
+  const today=new Date();today.setHours(0,0,0,0);
+  function status(date){
+    if(!date)return"Not entered";
+    const d=new Date(date+"T00:00:00");if(Number.isNaN(d.getTime()))return"Not entered";
+    const days=Math.ceil((d-today)/86400000);
+    if(days<0)return"EXPIRED";
+    if(days<=30)return"Due soon ("+days+" days)";
+    return"Valid";
+  }
+  let html=`<div class="report-summary">Total vehicles: <strong>${vehicles.length}</strong></div>`;
+  if(!vehicles.length)html+='<p class="empty-note">No vehicle records available to report.</p>';
+  vehicles.forEach((v,i)=>{
+    const expense=Number(v.serviceExpense)||0;
+    html+=`<div class="report-card">
+      <h3>${i+1}. ${escapeHTML(v.name||"Vehicle")} — ${escapeHTML(v.number||"Number not entered")}</h3>
+      <div class="report-grid">
+        ${[
+          ["Engine Number",v.engine],["Chassis Number",v.chassis],["Manufacturing Year",v.year],
+          ["Registration Due",v.registration],["Registration Status",status(v.registration)],
+          ["Tax Valid Till",v.tax],["Tax Status",status(v.tax)],
+          ["Insurance Valid Till",v.insurance],["Insurance Status",status(v.insurance)],
+          ["Service Date",v.serviceDate],["Service / Oil Change",v.serviceType],
+          ["Service Details",v.serviceDetails],["Service Expense","₹"+expense.toFixed(2)],
+          ["Next Service Due",v.nextService],["Other Service History",v.otherServices]
+        ].map(([k,val])=>`<div class="field"><strong>${escapeHTML(k)}:</strong> ${escapeHTML(val||"Not entered").replace(/\n/g,"<br>")}</div>`).join("")}
+      </div>
+    </div>`;
+  });
+  el("reportContent").innerHTML=html;showScreen("reports");
+}
+loadData();
+</script>
+</body>
+</html>
